@@ -28,3 +28,67 @@
 3. Webpack과 Bable의 용도?
 - 여러가지 파일을 한개로 결합하기 위해서 Webpack 사용
 - JSX를 비롯한 새로운 자바스크립트 문법들을 사용하기 위해서 우리는 Babel이라는 도구 사용.
+
+<hr>
+
+4. 필요한 것들
+- Node.js 설치 
+- Yarn 설치 (npm보다 더 나은 속도, 더 나은 캐싱 시스템을 사용하기 위함)
+- git
+- visual Studio Code
+
+<hr>
+
+5. 시작
+- create-react-app 설치
+<pre><code>
+yarn global add create-react-app
+create-react-app hello-react
+cd hello-react
+yarn start
+</code></pre>
+
+<hr>
+
+6. App.js 주석 확인하기
+<code><pre>import React, { Component } from 'react'; </pre></code>
+>> JSX를 사용할려면 꼭 필요!
+>> webpack을 사용하기에 가능한 작업
+
+## 컴포넌트 만드는방법
+>> ### 1. 클래스를 통해서 만드는 방법
+>>> 이때는 render() 함수 꼭 필요 그 후 JSX를 return 필요
+>>> export로 다른 곳에서 불러와서 사용 할 수 있도록 해준다.
+<code><pre> 
+class App extends Component{
+       render() {
+          return (
+          )
+       }
+}
+export default App;
+</pre></code>
+
+>> ### 2. 함수를 통하여 컴포넌트 만드는 방법
+>>> --- 나중에.. ---
+
+## 컴포넌트 보여주기
+>> index.js
+<code><pre>
+import App from './App';
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+</pre></code>
+>> StrictMode는 애플리케이션 내의 잠재적인 문제를 알아내기 위한 도구.
+>> Fragment와 같이 UI를 렌더링하지 않으며, 자손들에게 부가적인 검사와 경고를 활성화한다.
+>> StrictMode는 개발 모드에서만 활성화되기 때문에, 프로덕션 빌드에는 영향을 주지 않는다.   
+>> StrictMode 안에 있는 App의 자손까지 검사가 이루어짐.
+>>> - 안전하지 않는 생명주기를 사용하는 컴포넌트 발견
+>>> - 레거시 문자열 ref 사용에 대한 경고
+>>> - 권장되지 않는 findDOMNode 사용에 대한 경고
+>>> - 예상치 못한 부작용 검사
+>>> - 레거시 context API 
