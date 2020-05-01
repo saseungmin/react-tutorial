@@ -94,10 +94,71 @@ ReactDOM.render(
 >>> - 레거시 context API 
 
 ## props 와 state
-### [Counter.js 주석에 설명 있음!][counter]
+### [Counter.js 주석에 설명][counter]
 [counter]: https://github.com/saseungmin/react/blob/master/src/Counter.js "counter.js"
 >> 1. props
 >>> 부모 컴포넌트가 자깃 컴포넌트에게 주는 값.   
 >>> 자식 컴포넌트에서는 props를 받아오기만하고, 받아온 props를 직접 수정 할 수는 없다.
 >> 2. stats
 >>> 컴포넌트 내부에서 선언하며 내부에서 값을 변경 할 수 있다.
+
+## LifeCycle API
+### 컴포넌트 초기 생성
+>> constructor (컴포넌트 생성자 함수)
+
+<pre><code>
+constructor(props) {
+  super(props);
+}
+</code></pre>
+
+>> componentDidMount(){}
+>>> 컴포넌트가 화면에 나타나게 됐을 때 호출된다.
+
+### 컴포넌트 업데이트
+>> 컴포넌트가 업데이트는 props의 변화, 그리고 state의 변화에 따라 결정된다.
+>> 1. static getDerivedStateFromProps(nextProps, prevState) {}
+>>> 이 API는 props로 받아온 값을 state로 동기화 하는 작업을 해줘야 하는 경우에 사용   
+>> 2. shouldComponentUpdate(nextProps, nextState) {}
+>>> return false를 하면 업데이트 안함 (default true)   
+>>> 이 API 는 컴포넌트를 최적화하는 작업에서 매우 유용하게 사용된다.   
+>>> 쓸대없이 낭비되고 있는 cpu 처리량을 줄여주기 위해서 Virtual DOM에 리렌더링 하는 것도, 불필요한경우에 방지하기 위해서 사용된다.   
+>> 3. getSnapshotBeforeUpdate(prevProps, prevState) {}
+>>> render() 된다음에 실행   
+>>> DOM 변화가 일어나기 직전의 DOM 상태를 가져오고, 여기서 리턴하는 값은 componentDidUpdate 에서 3번째 파라미터로 받아올수 있게 된다.   
+>> 4. componentDidUpdate(prevProps, prevState, snapshot) {}
+>>> 이 시점에선 this.props 와 this.state 가 바뀜.   
+>>> 이전의 값인 prevProps, prevState를 조회 할 수 있다.   
+>>> getSnapshotBeforeUpdate에서 반환한 snapshot값은 세번째 값ㅇ로 받아온다.
+### 컴포넌트 제거
+>> componentWillUnmount() {}
+>>> 등록했었던 이벤트를 제거.
+
+### 오류 방지
+>> 렌더링 부분에서 오류 발생 시 사전에 방지 해주어야한다.
+>>> 1. 존재하지 않은 함수를 호출하려고 할때
+>>> 2. 배열이나 객체가 올줄 알았는데, 해당 객체나 배열이 존재하지 않을 때
+<pre><code>
+this.props.object.value;
+this.props.array.length;
+</code></pre>
+>>> render 함수에서 막아줄 수 있다.
+<pre><code>
+render() {
+  if (!this.props.object || !this.props.array || this.props.array.length ===0) return null;
+}
+</code></pre>
+>>> 또는, 컴포넌트의 기본값을 설정하는 defaultProps를 통해서 설정가능.
+<pre><code>
+class Sample extends Component {
+  static defaultProps = {
+    onIncrement: () => console.warn('onIncrement is not defined'),
+    object: {},
+    array: []
+  }
+}
+</code></pre>
+
+
+<hr>
+정보 출처 : https://velopert.com/category/dev-log/tech-log/react-js

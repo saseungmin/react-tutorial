@@ -1,5 +1,21 @@
 import React, {Component} from 'react';
 
+
+// 카운터 4일때 에러 호출
+// 개발 모드에서 제공해주는 기능
+// 프로덕션에서는 이 화면은 나타나지 않는다.
+// componentDidCatch를 통해서 자식 컴포넌트에서 발생한 에러를 잡을 수 있다.
+const Problematic = () => {
+    throw (new Error('error 났다'));
+    return (
+        <div>
+
+        </div>
+    );
+}
+
+
+
 class Counter extends Component{
     // class fields가 먼저 실행되고, 그 다음에 constructor에서 설정된 것이 나온다.
     // state 정의 할 때는 class fields 문법을 사용
@@ -13,6 +29,41 @@ class Counter extends Component{
         }
     }
     
+    constructor(props){
+        super(props);
+        console.log('constructor');
+    }
+
+    componentWillMount(){
+        console.log('componentWillMount(deprecated)');
+    }
+
+    componentDidMount(){
+        console.log('componentDidMount');
+    }
+
+    shouldComponentUpdate(nextProps, nextState){
+        //5의 배수라면 리렌더링 하지 않음
+        console.log('shouldComponentUpdate');
+        if(nextState.number % 5 === 0) return false;
+        return true;
+    }
+
+    componentWillUpdate(nextProps,nextState){
+        console.log('componentWillUpdate');
+    }
+    componentDidUpdate(preProps, prevState){
+        console.log('componentDidUpdate');
+    }
+
+    // 컴포넌트 자신의 render 함수에서 에러가 발생해버리는것은 잡아낼 수는 없지만,
+    // 그 대신에 컴포넌트의 자식 컴포넌트 내부에서 발생ㅇ하는 에러는 잡아낼 수 있다.
+    componentDidCatch(error,info){
+        this.setState({
+            error : true
+        });
+    }
+
     // 메소드 작성 방법 1
     handleIncrease =() => {
         // state에 있는 값을 바꾸기 위해서는, this.setState를 무조건 거쳐야한다.
@@ -47,12 +98,16 @@ class Counter extends Component{
     }
 
     render(){
+        console.log('render');
+
+        if(this.state.error) return (<h1>에러 발생 !</h1>)
         return(
             // 이벤트이름 설정 할 때 camelCase 설절 필수!!
             // 절달해주는 값은 함수여야 한다! ex) {this.handleIncrease()} => 안됨! 무한반복현상
             <div>
                 <h1>카운터</h1>
                 <div>값 : {this.state.number}</div>
+                { this.state.number === 4 && <Problematic/>}
                 <button onClick={this.handleIncrease}>+</button>
                 <button onClick={this.handleDecrease}>-</button>
             </div>
