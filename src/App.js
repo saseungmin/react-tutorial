@@ -1,5 +1,8 @@
 import React, {Component, Fragment} from 'react';
-import './App.css'
+import './App.css';
+import MyName from './MyName';
+import Counter from './Counter';
+
 
 class App extends Component{
   render(){
@@ -37,6 +40,7 @@ class App extends Component{
       // JSX 내부에서 조건부 렌더링을 할 때는 보통 삼항 연산자를 사용, AND 연산자를 사용
       // 반면 if문을 사용할 수 없다.(사용하려면 IIFE 사용)
       <Fragment>
+        <MyName />
         <div className="App">리엑트</div>
         <div style ={style}>
           hello {name}!
@@ -72,6 +76,7 @@ class App extends Component{
           }
 
         </div>
+        <Counter/>
       </Fragment>
     )
   }

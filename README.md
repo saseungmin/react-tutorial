@@ -92,3 +92,11 @@ ReactDOM.render(
 >>> - 권장되지 않는 findDOMNode 사용에 대한 경고
 >>> - 예상치 못한 부작용 검사
 >>> - 레거시 context API 
+
+## props 와 state
+### Counter.js 주석에 설명 있음!
+>> 1. props
+>>> 부모 컴포넌트가 자깃 컴포넌트에게 주는 값.   
+>>> 자식 컴포넌트에서는 props를 받아오기만하고, 받아온 props를 직접 수정 할 수는 없다.
+>> 2. stats
+>>> 컴포넌트 내부에서 선언하며 내부에서 값을 변경 할 수 있다.
