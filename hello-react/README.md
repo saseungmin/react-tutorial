@@ -1,7 +1,4 @@
-# [React] 시작해보자
-- START 2020/04/29
-<hr>
-
+# [Hello-React]
 
 1. React란?
 - 자바스크립트 라이블러리
