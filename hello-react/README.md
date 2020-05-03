@@ -92,7 +92,7 @@ ReactDOM.render(
 
 ## props 와 state
 ### [Counter.js 주석에 설명][counter]
-[counter]: https://github.com/saseungmin/react/blob/master/src/Counter.js "counter.js"
+[counter]: https://github.com/saseungmin/react-tutorial/blob/master/hello-react/src/Counter.js "counter.js"
 >> 1. props
 >>> 부모 컴포넌트가 자깃 컴포넌트에게 주는 값.   
 >>> 자식 컴포넌트에서는 props를 받아오기만하고, 받아온 props를 직접 수정 할 수는 없다.
