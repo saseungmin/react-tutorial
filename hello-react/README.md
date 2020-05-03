@@ -155,7 +155,3 @@ class Sample extends Component {
   }
 }
 </code></pre>
-
-
-<hr>
-정보 출처 : https://velopert.com/category/dev-log/tech-log/react-js
