@@ -38,8 +38,8 @@ class PhoneFrom extends Component{
             <form onSubmit={this.handleSubmit}>
                 <input placeholder="이름" value={this.state.name} name="name" onChange={this.handleChange} />
                 <input placeholder="전화번호" value={this.state.phone} name="phone" onChange={this.handleChange}/>
-                <h2>{this.state.name}, {this.state.phone}</h2>
                 <button type="submit">등록</button>
+                <h2>{this.state.name} {this.state.phone}</h2>
             </form>
         );
     }
