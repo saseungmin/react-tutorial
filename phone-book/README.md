@@ -26,5 +26,20 @@ this.props.onCreate(this.state);
 > ### 리액트에서 불변성 유지가 중요한 이유
 >> 불변성을 유지해야 리액트에서 모든것들이 필요한 상황에 리렌더링 되도록 설계 할 수 있고, 그렇게 해야 나중에 성능도 최적화 할 수 있기 때문.
 
+## 4. 데이터 필터링 시 유의사항
+> input에 입력을 했을 때 업데이가 필요한 것은 오직 input 뿐이다.   
+> 하지만, App 컴포넌트의 상태가 업데이트 되면, 컴포넌트의 리렌더링이 발생하게 되고, 컴포넌트가 리렌더링 되면 그 컴포넌트의 자식 컴포넌트도 리렌더링 된다.   
+> 때문에, Virtual DOM에 렌더링 하는 자원을 아끼기 위해서 shouldComponentUpdate LifeCycle API를 사용한다.   
+<pre><code>
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.data !== this.props.data;
+  }
+ 
+</code></pre>
+> #### 불변성이 중요한 이유는 바로바로 비교할 수 있기 때문!
+
+>> 자세한 사항: 각각 주석에
+
 <hr>
 ※ 정보 출처 : https://velopert.com/category/dev-log/tech-log/react-js
