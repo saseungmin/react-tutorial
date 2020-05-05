@@ -2,6 +2,7 @@ import React, {Component, Fragment} from 'react';
 import './App.css';
 import MyName from './MyName';
 import Counter from './Counter';
+import Say from './Say';
 
 
 class App extends Component{
@@ -76,6 +77,7 @@ class App extends Component{
           }
 
         </div>
+        <Say/>
         <Counter/>
       </Fragment>
     )
