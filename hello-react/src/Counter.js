@@ -57,7 +57,7 @@ class Counter extends Component{
     }
 
     // 컴포넌트 자신의 render 함수에서 에러가 발생해버리는것은 잡아낼 수는 없지만,
-    // 그 대신에 컴포넌트의 자식 컴포넌트 내부에서 발생ㅇ하는 에러는 잡아낼 수 있다.
+    // 그 대신에 컴포넌트의 자식 컴포넌트 내부에서 발생하는 에러는 잡아낼 수 있다.
     componentDidCatch(error,info){
         this.setState({
             error : true

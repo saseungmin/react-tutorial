@@ -3,6 +3,9 @@ import './App.css';
 import MyName from './MyName';
 import Counter from './Counter';
 import Say from './Say';
+import EventPractice from './EventPractice';
+import ScrollBox from './ScrollBox';
+import IterationSample from './IterationSample';
 
 
 class App extends Component{
@@ -79,6 +82,14 @@ class App extends Component{
         </div>
         <Say/>
         <Counter/>
+        <EventPractice/>
+        <ScrollBox ref={(ref) => this.scrollBox=ref}/>
+        {/*this.scrollBox.scrollToBottom 할 때 처음 렌더링될 때는 undefined가 되서 값을 읽어오는 과정에서 오류가 발생
+          때문에 화살표 함수 문법을 사용하여 아예 새로운 함수를 만들고 그 내부에서 this.scrollBox.scrollToBottom 메소드를 실행하면 
+          버튼을 누를 때 this.scrollBox.scrollToBottom 값을 읽어 와서 실행하므로 오류가 발생하지 않는다.
+        */}
+        <button onClick={() => this.scrollBox.scrollToBottom()}>맨 밑으로 </button>
+        <IterationSample/>
       </Fragment>
     )
   }
