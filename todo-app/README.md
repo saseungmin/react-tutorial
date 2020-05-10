@@ -64,7 +64,7 @@ $ yarn add node-sass classnames react-icons
 <pre><code>
 $ yarn add react-virtualized
 </code></pre>
-- TodoList.js를 수정
+- <code>TodoList.js</code>를 수정
 <pre><code>
 import {List} from 'react-virtualized';
 // userCallback 함수 추가
@@ -90,7 +90,7 @@ import {List} from 'react-virtualized';
         />
 </code></pre>
 
-- TodoListItem.js 수정 
+- <code>TodoListItem.js</code> 수정 
 <pre><code>
 // 컴포넌트 사이사이에 테두리를 쳐주고, 홀수/ 짝수 번째 항목에 다른 색상을 설정하기 위함
         <div className="TodoListItem-virtualized" style={style}>
