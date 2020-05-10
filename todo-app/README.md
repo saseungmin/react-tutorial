@@ -93,9 +93,10 @@ import {List} from 'react-virtualized';
 - <code>TodoListItem.js</code> 수정 
 <pre><code>
 // 컴포넌트 사이사이에 테두리를 쳐주고, 홀수/ 짝수 번째 항목에 다른 색상을 설정하기 위함
-        <div className="TodoListItem-virtualized" style={style}>
-          // 생략
-        </div>
+< div className="TodoListItem-virtualized" style={style} >
+  // 생략
+  
+< /div>
         
 </code></pre>
 - react-virtualized를 사용했더니 <b>0.005초</b> 까지 줄어들었다!!
