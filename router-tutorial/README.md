@@ -38,7 +38,7 @@ $ yarn add react-router-dom
 < Route path={['주소규칙','주소규칙']} component={보여 줄 컴포넌트} exact={true}/> 
 
 // component 대신 render를 사용해 보여주고 싶은 JSX를 넣어 줄 수 있다.
-< Route path="/profiles" exact render={() => <div>사용자를 선택해 주세요.</div>}/>
+< Route path="/profiles" exact render={() => < div>사용자를 선택해 주세요.< /div>}/>
 
 </code></pre>
 
