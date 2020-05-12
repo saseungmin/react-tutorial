@@ -22,32 +22,36 @@ $ yarn add react-router-dom
 <pre><code>
   // 웹 애플리케이션에 있는 HTML5의 history API를 사용하여 페이지를 새로고침하지 않고도 주소를 변경하고
   // 현재 주소에 관련된 정보를 props로 쉽게 조회하거나 사용할 수 있도록 해준다.
-    <BrowserRouter>
-        <App/>
-    </BrowserRouter>
+    < BrowserRouter>
+        < App/>
+    < /BrowserRouter>
 
 </code></pre>
 
 ### 2.1 Route 컴포넌트로 특정 주소에 컴포넌트 연결
 - exact는 <code>/about</code> , <code>/</code> 경로가 겹치는 상황에서 <code>exact={true}</code> 를 하면 같이 안보이게 된다.
 <pre><code> 
-<Route path="주소규칙" component={보여 줄 컴포넌트} exact={true}/> 
+
+< Route path="주소규칙" component={보여 줄 컴포넌트} exact={true}/> 
+
 // 여려개의 path 지정할 때
-<Route path={['주소규칙','주소규칙']} component={보여 줄 컴포넌트} exact={true}/> 
+< Route path={['주소규칙','주소규칙']} component={보여 줄 컴포넌트} exact={true}/> 
+
 // component 대신 render를 사용해 보여주고 싶은 JSX를 넣어 줄 수 있다.
-<Route path="/profiles" exact render={() => <div>사용자를 선택해 주세요.</div>}/>
+< Route path="/profiles" exact render={() => < div>사용자를 선택해 주세요.< /div>}/>
+
 </code></pre>
 
 ### 2.2 Link 컴포넌트로 다른 주소에 이동
 - a 태그 같은 개념 but, a태그 사용시 페이지를 새로 불러오기 때문에 애플리케이션이 들고 있던 상태를 모두 날려 버리게 된다.
-<pre><code> <Link to="주소">내용</Link> </code></pre>
+<pre><code> < Link to="주소">내용< /Link> </code></pre>
 
 ## 3. URL 파라미터와 쿼리
 ### 3.1 URL 파라미터
 <pre><code> 
 // App.js
-<Link to="/profiles/seungmin">seungmin</Link>
-<Route path="/profiles/:username" component={Profile} />
+< Link to="/profiles/seungmin">seungmin< /Link>
+< Route path="/profiles/:username" component={Profile} />
 // profile.js
 const Profile = ({match}) => {
     const {username} = match.params; //params로 값을 받을 수 있다.
@@ -83,19 +87,19 @@ $ yarn add ps
 - <code>Switch</code> 컴포넌트는 여러 <code>Router</code>를 감싸사 그 중 일치하는 단 하나의 라우트만을 렌더링시켜 준다.
 <pre><code>
 
-      <Switch>
-          <Route path="/" component={Home} exact={true}/>
-          <Route path={["/about",'/info']} component={About}/>      
-          <Route path="/profiles" component={Profiles}/>
-          <Route path="/history" component={HistorySample} />
-          <Route //path를 따로 정의하지 않으면 모든 상황에서 렌더링됨
+      < Switch>
+          < Route path="/" component={Home} exact={true}/>
+          < Route path={["/about",'/info']} component={About}/>      
+          < Route path="/profiles" component={Profiles}/>
+          < Route path="/history" component={HistorySample} />
+          < Route //path를 따로 정의하지 않으면 모든 상황에서 렌더링됨
             render = {({location}) => (
-              <div>
-                <h2>이 페이지는 존재하지 않습니다:</h2>
-                <p>{location.pathname}</p>
-              </div>
+              < div>
+                < h2>이 페이지는 존재하지 않습니다:< /h2>
+                < p>{location.pathname}< /p>
+              < /div>
             )} />
-      </Switch>
+      < /Switch>
 
 </code></pre>
 
@@ -104,5 +108,5 @@ $ yarn add ps
 - 현재 경로와 <code>Link</code>에서 사용하는 경로가 일치하는 경우 특정 스타일 혹은 CSS클래스를 적용할 수 있다.
 - <code>NavLink</code>에서 링크가 활성화 되었을 때 스타일 적용할 때는 <code>activeStyle</code>값을, CSS클래스를 적용할 때는 <code>activeClassName</code> 값을 <code>props</code>로 넣어 준다.
 <pre><code>
-<NavLink activeStyle={activeStyle} to="/profiles/seungmin">seungmin</NavLink>
+< NavLink activeStyle={activeStyle} to="/profiles/seungmin">seungmin< /NavLink>
 </code></pre>
