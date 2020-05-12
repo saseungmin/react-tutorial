@@ -32,3 +32,6 @@
 
 ## 7. [router-tutorial](https://github.com/saseungmin/react-tutorial/tree/master/router-tutorial)
 - 리액트 라우터로 SPA 개발하기
+
+## 8. [news-viewer](https://github.com/saseungmin/react-tutorial/tree/master/news-viewer)
+- 외부 API를 연동하여 뉴스 뷰어 만들기
