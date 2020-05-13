@@ -53,7 +53,7 @@ $ yarn eject
 - .css or .scss 확장자를 가진 스타일 파일을 따로 만들지 않아도 된다.
 - src/StyledComponent.ks 파일
 - VScode 마켓플레이스에서 vscode-style-components 다운
-<code><pre>
+<pre><code>
 $ yarn add styled-components
 </pre></code>
 - Tagged 템플릿 리터럴을 사용하면 자바스크립트 객체나 함수의 원본 값을 그대로 추출 가능. (props 쉽게 조회)
