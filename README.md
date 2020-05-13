@@ -39,3 +39,6 @@
 ## 9. [context-tutorial](https://github.com/saseungmin/react-tutorial/tree/master/context-tutorial)
 - context API 사용법 익히기
 - Consumer 대신 Hook(useContext) or 클래스 컴포넌트(static contextType) 사용하기
+
+## 10. [vanilla-redux](https://github.com/saseungmin/react-tutorial/tree/master/vanilla-redux)
+- 리덕스 라이브러리 개념 이해하기
