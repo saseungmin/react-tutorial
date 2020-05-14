@@ -63,3 +63,5 @@ ReactDOM.render(
 ### 3.3 Redux DevTools 설치
 - 리덕스 개발자 도구이며, 크롬 확장 프로그램으로 설치하여 사용가능.
 - Redux DevTools
+<hr>
+<img src="./img/redux-devtools.PNG" width="700" height="500">
