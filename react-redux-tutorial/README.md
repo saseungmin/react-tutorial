@@ -127,7 +127,7 @@ export default connect(
 </pre>
 
 ### 4.3 bindActionCreators 유틸 함수를 사용한 방법
-- 리덕스에서 제공하는 유틸 함수를 사용한 방법으로 <code>dispatch</code>로 감싸는 작업이 번거롭다.
+- 리덕스에서 제공하는 유틸 함수를 사용한 방법으로 <code>dispatch</code>로 감싸는 번거로운 작업을 좀 더 편하게 해준다.
 <pre>
 import { bindActionCreators } from 'redux';
 
@@ -193,8 +193,8 @@ const counter = handleActions(
 )
 </pre>
 
-- 액션 생성 함수에 파라미터가 필요할 때
-- <code>createAction</code>으로 액션을 만들면 역션에 필요한 추가 데이터는 payload라는 이름을 사용.
+- 액션 생성 함수에 파라미터가 필요할 때는 아래 방식처럼 사용한다.
+- <code>createAction</code>으로 액션을 만들면 액션에 필요한 추가 데이터는 <code>payload</code>라는 이름만을 사용한다.
 <pre>
 export const insert = createAction(INSERT, text => ({
     id : id++,
@@ -213,7 +213,7 @@ const todos = handleActions(
     }
 )
 </pre>
-- payload라는 이름이 다 같기 때문에 헷갈릴 수 있다.
+- <code>payload</code>라는 이름이 다 같기 때문에 헷갈릴 수 있다.
 - 비구조화 할당 문법으로 이름을 새로 설정
 <pre>
     {
@@ -256,7 +256,7 @@ const number = useSelector(state => state.counter.number);
 </pre>
 
 ### 6.2 useDispatch를 사용하여 액션 디스패치하기
-- 숫자가 업데이트 될때마다 리렌더링이 되기때문에 <code>useCallback</code>으로 액션을 디스패치하는 함수를 감싸준다.
+- 값이 업데이트 될 때마다 리렌더링이 되기때문에 <code>useCallback</code>으로 액션을 디스패치하는 함수를 감싸준다.
 <pre>
 import { useDispatch } from 'react-redux';
 
