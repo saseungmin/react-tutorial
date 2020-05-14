@@ -26,7 +26,10 @@ const TodosContainer = () => {
         <Todos input={input} todos={todos} onChangeInput={onChangeInput} onInsert={onInsert} onToggle={onToggle} onRemove={onRemove} />
     )
 }
-export default TodosContainer;
+
+// connect 함수인 경우 해당 컨테이너 컴포넌트의 부모 컴포넌트가 리렌더링될 때 해당 컨테이너 컴포넌트의 props가 바뀌지 않았다면, 리렌더링이 자동으로 방지되어 성능이 최적화 된다.
+// 반면, useSelector를 사용하여 리덕스 상태를 조회했을 때는 자동으로 이루어지지 않으므로 React.memo를 컨테이너 컴포넌트에 사용해 줘야한다.
+export default React.memo(TodosContainer);
 // hooks 사용전
 // const TodosContainer = ({
 //     input, // 인풋에 입력되는 텍스트
