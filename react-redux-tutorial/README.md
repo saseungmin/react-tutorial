@@ -272,7 +272,7 @@ const onDecrease = useCallback(() => dispatch(decrease()),[dispatch]);
 ### 6.3 useAction 유틸 Hook 만들어서 사용하기
 - 원래 <code>useAction</code>는 react-redux에 내장된 상태로 릴리즈될 계획이나 필요하지 않다는 판단으로 제외되었다. 그 대신 공식 문서에서 그대로 복사하여 사용가능하다.
 - 참고링크 : (https://react-redux.js.org/api/hooks#removed-useactions)
-- _"이 후크는 원래 알파 릴리스에 있었지만 Dan Abramov의 제안 v7.1.0-alpha.4 에 따라에서 제거되었습니다 . <br> <code>useDispatch</code>대한 참조를 검색하고 필요에 따라 콜백 및 효과를 <code>dispatch</code>수동으로 호출하려면 구성 요소 의 Hook를 호출하는 것이 좋습니다. <br> 이 Hook를 직접 사용하려면 액션 작성자를 단일 함수, 배열 또는 객체로 전달하는 것을 지원하는 복사 가능 버전이 있습니다."_
+- _"이 Hook은 원래 알파 릴리스에 있었지만 Dan Abramov의 제안 v7.1.0-alpha.4 에 따라에서 제거되었습니다 . <br> <code>useDispatch</code>대한 참조를 검색하고 필요에 따라 콜백 및 효과를 <code>dispatch</code>수동으로 호출하려면 구성 요소 의 Hook를 호출하는 것이 좋습니다. <br> 이 Hook를 직접 사용하려면 액션 작성자를 단일 함수, 배열 또는 객체로 전달하는 것을 지원하는 복사 가능 버전이 있습니다."_
 - 여러 개의 액션을 사용해야 하는 경우 코드가 깔끔해진다.
 <pre>
 // lib/useActions.js
