@@ -42,3 +42,6 @@
 
 ## 10. [vanilla-redux](https://github.com/saseungmin/react-tutorial/tree/master/vanilla-redux)
 - 리덕스 라이브러리 개념 이해하기
+
+## 11. [react-redux-tutorial](https://github.com/saseungmin/react-tutorial/tree/master/react-redux-tutorial)
+- 리덕스를 사용하여 리액트 애플리케이션 상태 관리하기
