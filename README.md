@@ -45,3 +45,6 @@
 
 ## 11. [react-redux-tutorial](https://github.com/saseungmin/react-tutorial/tree/master/react-redux-tutorial)
 - 리덕스를 사용하여 리액트 애플리케이션 상태 관리하기
+
+## 12. [learn-redux-middleware](https://github.com/saseungmin/react-tutorial/tree/master/learn-redux-middleware)
+- 리덕스 미들웨어를 통한 비동기 작업 관리
