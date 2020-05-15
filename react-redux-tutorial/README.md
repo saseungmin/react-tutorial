@@ -127,7 +127,7 @@ export default connect(
 </pre>
 
 ### 4.3 bindActionCreators 유틸 함수를 사용한 방법
-- 리덕스에서 제공하는 유틸 함수를 사용한 방법으로 <code>dispatch</code>로 감싸는 작업이 번거롭다.
+- 리덕스에서 제공하는 유틸 함수를 사용한 방법으로 <code>dispatch</code>로 감싸는 번거로운 작업을 좀 더 편하게 해준다.
 <pre>
 import { bindActionCreators } from 'redux';
 
@@ -193,8 +193,8 @@ const counter = handleActions(
 )
 </pre>
 
-- 액션 생성 함수에 파라미터가 필요할 때
-- <code>createAction</code>으로 액션을 만들면 역션에 필요한 추가 데이터는 payload라는 이름을 사용.
+- 액션 생성 함수에 파라미터가 필요할 때는 아래 방식처럼 사용한다.
+- <code>createAction</code>으로 액션을 만들면 액션에 필요한 추가 데이터는 <code>payload</code>라는 이름만을 사용한다.
 <pre>
 export const insert = createAction(INSERT, text => ({
     id : id++,
@@ -213,7 +213,7 @@ const todos = handleActions(
     }
 )
 </pre>
-- payload라는 이름이 다 같기 때문에 헷갈릴 수 있다.
+- <code>payload</code>라는 이름이 다 같기 때문에 헷갈릴 수 있다.
 - 비구조화 할당 문법으로 이름을 새로 설정
 <pre>
     {
@@ -256,7 +256,7 @@ const number = useSelector(state => state.counter.number);
 </pre>
 
 ### 6.2 useDispatch를 사용하여 액션 디스패치하기
-- 숫자가 업데이트 될때마다 리렌더링이 되기때문에 <code>useCallback</code>으로 액션을 디스패치하는 함수를 감싸준다.
+- 값이 업데이트 될 때마다 리렌더링이 되기때문에 <code>useCallback</code>으로 액션을 디스패치하는 함수를 감싸준다.
 <pre>
 import { useDispatch } from 'react-redux';
 
@@ -272,7 +272,7 @@ const onDecrease = useCallback(() => dispatch(decrease()),[dispatch]);
 ### 6.3 useAction 유틸 Hook 만들어서 사용하기
 - 원래 <code>useAction</code>는 react-redux에 내장된 상태로 릴리즈될 계획이나 필요하지 않다는 판단으로 제외되었다. 그 대신 공식 문서에서 그대로 복사하여 사용가능하다.
 - 참고링크 : (https://react-redux.js.org/api/hooks#removed-useactions)
-- _"이 후크는 원래 알파 릴리스에 있었지만 Dan Abramov의 제안 v7.1.0-alpha.4 에 따라에서 제거되었습니다 . <br> <code>useDispatch</code>대한 참조를 검색하고 필요에 따라 콜백 및 효과를 <code>dispatch</code>수동으로 호출하려면 구성 요소 의 Hook를 호출하는 것이 좋습니다. <br> 이 Hook를 직접 사용하려면 액션 작성자를 단일 함수, 배열 또는 객체로 전달하는 것을 지원하는 복사 가능 버전이 있습니다."_
+- _"이 Hook은 원래 알파 릴리스에 있었지만 Dan Abramov의 제안 v7.1.0-alpha.4 에 따라에서 제거되었습니다 . <br> <code>useDispatch</code>대한 참조를 검색하고 필요에 따라 콜백 및 효과를 <code>dispatch</code>수동으로 호출하려면 구성 요소 의 Hook를 호출하는 것이 좋습니다. <br> 이 Hook를 직접 사용하려면 액션 작성자를 단일 함수, 배열 또는 객체로 전달하는 것을 지원하는 복사 가능 버전이 있습니다."_
 - 여러 개의 액션을 사용해야 하는 경우 코드가 깔끔해진다.
 <pre>
 // lib/useActions.js
