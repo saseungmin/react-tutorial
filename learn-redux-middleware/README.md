@@ -65,7 +65,7 @@ const store = createStore(rootReducer ,applyMiddleware(logger));
 - <b>redux-saga</b>
 > 특정 액션이 디스패치되었을 때 정해진 로직에 따라 다른 액션을 디스패치시키는 규칙을 작성하여 비동기 작업을 처리할 수 있게 해준다.
 
-### 2.1 redux-thunk
+## 2.1 redux-thunk
 - redux-thunk 라이브러리 설치
 <pre>$ yarn add redux-thunk</pre>
 - index.js에서 스토어를 만들 때 redux-thunk를 적용한다.
@@ -73,7 +73,7 @@ const store = createStore(rootReducer ,applyMiddleware(logger));
 const store = createStore(rootReducer ,applyMiddleware(logger, ReduxThunk));
 </pre>
 
-#### 2.1.1 Thunk 생성 함수 만들기
+### 2.1.1 Thunk 생성 함수 만들기
 - redux-thunk는 액션 생성 함수에서 일반 액션 객체를 반환하는 대신에 <b>함수</b>를 반환한다.
 - modules/counter.js에 추가
 <pre>
@@ -94,7 +94,7 @@ export const decreaseAsync = () => dispatch => {
 
 ![redux-thunk 적용](img/1.PNG)
 
-#### 2.1.2 웹 요청 비동기 작업 처리하기
+### 2.1.2 웹 요청 비동기 작업 처리하기
 - JSONPlaceHolder 가짜 api 사용
 - Promise 기반 웹 클라이언트 axios 사용하기 위해 라이브러리 설치
 <pre>
@@ -132,7 +132,7 @@ const App = () => {
 };
 </pre>
 
-#### 2.1.3 리팩토링 작업
+### 2.1.3 리팩토링 작업
 - API를 요청해야 할 때 마다 <code>thunk</code>함수를 작성하는 것과 로딩 상태의 리듀서에서 관리하는 작업은 코드와 귀찮은 작업이다.
 - 반복되는 로직을 따로 분리하여 처리해서 코드의 양을 줄인다.
 - <code>thunk</code> 함수를 한줄로 생성할 수 있게 한다.
@@ -208,3 +208,122 @@ export default connect(({sample,loading}) => ({
 }
 )(SampleContainer);
 </pre>
+
+## 2.2 redux-saga
+🔶 redux-saga 사용 시 유용한 점
+> - 기존 요청을 취소 처리해야 할 때 (불필요한 중복 요청 방지)
+> - 특정 액션이 발생했을 때 다른 액션을 발생시키거나, API 요청 등 리덕스와 관계없는 코드를 실행할 때
+> - 웹소켓을 사용할 때
+> - API 요청 실패 시 재요청해야 할 떄
+### 2.2.1 제너레이터 함수
+- 함수를 작셩할 때 함수를 특정 구간에 멈춰 놓을 수 있고, 원할 때 다시 돌아가게 할 수 있다.
+
+> ![제너레이터](img/2.PNG)
+<br>
+- 제너레이터 함수 문법 기반으로 비동기 작업을 관리 해준다.
+- redux-saga는 디스패치하는 액션을 모니터링해서 <b>그에 따라 필요한 작업을 따로</b> 수행할 수 있는 미들웨어이다.
+
+### 2.2.2 redux-saga 비동기 처리 하기
+
+- redux-saga와 리덕스 개발자 도구 라이브러리 설치
+<pre>
+$ yarn add redux-saga
+$ yarn add redux-devtools-extension
+</pre>
+- redux-saga에 대한 액션 타입과 액션 생성 함수를 만들고 제너레이터 함수를 만든다.
+- 이 제너레이터 함수를 사가(saga)라고 부른다.
+
+<pre>
+// modules/counter.js
+import {delay, put, takeEvery, takeLatest,throttle} from 'redux-saga/effects';
+// 액션 타입
+const INCREASE_ASYNC = 'counter/INCREASE_ASYNC';
+const DECREASE_ASYNC = 'counter/DECREASE_ASYNC';
+
+// 마우스 클릭 이벤트가 payload 안에 들어가지 않도록 () => undifinded를 두 번째 파라미터로 넣어 준다.
+export const increaseAsync = createAction(INCREASE_ASYNC, () => undefined);
+export const decreaseAsync = createAction(DECREASE_ASYNC, () => undefined);
+
+function* increaseSaga(){
+    yield delay(1000); // 1초 기달린다.
+    yield put(increase()); // 특정 액션 디스패치
+}
+
+function* decreaseSaga(){
+    yield delay(1000); // 1초 기달린다.
+    yield put(decrease()); // 특정 액션 디스패치
+}
+
+export function* counterSaga(){
+    // takeEvery는 들어오는 모든 액션에 대해 특정 작업을 처리해 준다.
+    yield takeEvery(INCREASE_ASYNC, increaseSaga);
+    
+    // takeLatest는 기존에 진행 중이던 작업이 있다면 취소 처리하고
+    // 가장 마지막으로 실행된 작업만 수행한다.
+    yield takeLatest(DECREASE_ASYNC, decreaseSaga);
+}
+</pre>
+
+- 루트 사가를 만들어준다.
+<pre>
+// modules/index.js
+export function* rootSaga(){
+    // all 함수는 여러 Saga를 합쳐 주는 역할을 한다.
+    yield all([counterSaga(),함수,함수]);
+}
+</pre>
+
+- 스토어에 redux-saga 미들웨어를 적용시켜준다.
+<pre>
+// index.js
+import createSagaMiddleware from 'redux-saga';
+import {composeWithDevTools} from 'redux-devtools-extension';
+// redux- saga 적용
+const logger= createLogger();
+const sagaMiddleware = createSagaMiddleware();
+// composeWithDevTools 리덕스 개발자 도구 적용
+const store = createStore(rootReducer,composeWithDevTools(applyMiddleware(logger,ReduxThunk,sagaMiddleware)));
+sagaMiddleware.run(rootSaga);
+</pre>
+
+- 실행해서 +1 버튼클릭을 2번하면 <code>takeEvery</code>함수는 액션이 두 번 디스패치되어 두 번 실행하게 된다.
+- -1 버튼은 <code>takeLatest</code>를 사용했기 때문에 두 번 디스패치되어도 액션은 한 번 디스패치되어 액션이 중첩되면 기존 것들은 무시하고 <b>가장 마지막 액션만 제대로 처리한다.</b>
+
+> ![takeLatest](img/3.PNG)
+
+### 2.2.3 API호출과 리팩토링
+- API호출과 리팩토링 작업은 코드 내용과 주석에 포함되어 있다.
+- redux-thunk와 매우 흡사.
+
+### 2.2.4 redux-saga의 기타 기능들
+- 사가 내부에서 현재 상태를 조회할 수 있다.
+<pre>
+// modules/counter.js
+function* increaseSaga(){
+    yield delay(1000); // 1초 기달린다.
+    yield put(increase()); // 특정 액션 디스패치
+    // Saga 내부에서 현재 상태를 조회할 수 있다. select
+    const number = yield select(state => state.counter); // state는 스토어 상태를 의미
+    console.log(`현재 값은 ${number} 입니다.`);
+}
+</pre>
+> ![takeLatest](img/4.PNG)
+<hr>
+
+- 사가가 실행되는 주기를 제한하는 방법.
+- <code>takeEvery</code> 대신 <code>throttle</code> 함수를 사용하면 사가가 n초에 단 한 번만 호출되도록 설정할 수 있다.
+<pre>
+export function* counterSaga(){
+    // takeEvery는 들어오는 모든 액션에 대해 특정 작업을 처리해 준다.
+    //yield takeEvery(INCREASE_ASYNC, increaseSaga);
+
+    // 첫번째 파라미터 : n초 * 1000
+    yield throttle(3000, INCREASE_ASYNC,increaseSaga);
+    
+    // takeLatest는 기존에 진행 중이던 작업이 있다면 취소 처리하고
+    // 가장 마지막으로 실행된 작업만 수행한다.
+    yield takeLatest(DECREASE_ASYNC, decreaseSaga);
+}
+</pre>
+
+✔ redux-saga 메뉴얼 참고 : http://redux-saga.js.org/
