@@ -296,18 +296,20 @@ sagaMiddleware.run(rootSaga);
 - redux-thunk와 매우 흡사.
 
 ### 2.2.4 redux-saga의 기타 기능들
-- 사가 내부에서 현재 상태를 조회할 수 있다.
+- <code>select</code>함수를 사용하여 사가 내부에서 현재 상태를 조회할 수 있다.
 <pre>
 // modules/counter.js
 function* increaseSaga(){
     yield delay(1000); // 1초 기달린다.
     yield put(increase()); // 특정 액션 디스패치
     // Saga 내부에서 현재 상태를 조회할 수 있다. select
-    const number = yield select(state => state.counter); // state는 스토어 상태를 의미
+    const number = yield <b>select</b>(state => state.counter); // state는 스토어 상태를 의미
     console.log(`현재 값은 ${number} 입니다.`);
 }
 </pre>
+
 > ![takeLatest](img/4.PNG)
+
 <hr>
 
 - 사가가 실행되는 주기를 제한하는 방법.
@@ -318,7 +320,7 @@ export function* counterSaga(){
     //yield takeEvery(INCREASE_ASYNC, increaseSaga);
 
     // 첫번째 파라미터 : n초 * 1000
-    yield throttle(3000, INCREASE_ASYNC,increaseSaga);
+    yield <b>throttle</b>(3000, INCREASE_ASYNC,increaseSaga);
     
     // takeLatest는 기존에 진행 중이던 작업이 있다면 취소 처리하고
     // 가장 마지막으로 실행된 작업만 수행한다.
