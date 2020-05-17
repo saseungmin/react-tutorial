@@ -49,3 +49,8 @@
 
 ## 12. [learn-redux-middleware](https://github.com/saseungmin/react-tutorial/tree/master/learn-redux-middleware)
 - 리덕스 미들웨어를 통한 비동기 작업 관리
+
+## 13. [splitting-sample](https://github.com/saseungmin/react-tutorial/tree/master/splitting-sample)
+- 코드 스플리팅
+- React.lazy 와 Suspense
+- Loadable Components
