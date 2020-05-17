@@ -67,3 +67,67 @@ export default SplitMe;
 
 - <code>React.lazy</code>는 컴포넌트를 렌더링하는 시점에서 비동기적으로 로딩할 수 있게 해 주는 유틸 함수이다.
 - <code>Suspense</code>는 리액트 내장 컴포넌트로서 코드 스플리팅된 컴포넌트를 로딩하도록 발동시킬 수 있고, 로딩이 끝나지 않았을 때 보여줄 UI를 설정할 수 있다.
+- <code>Suspense</code>는 <code>fallback props</code>를 통해 로딩 중에 보여줄 JSX를 지정할 수 있다.
+<pre>
+// App.js
+<b>const SplitMe = React.lazy(() => import('./SplitMe'));</b>
+
+const App = () => {
+  const [visible, setVisible] = useState(false);
+  const onClick = () => {
+    setVisible(true);
+  }
+  return (
+    < div className="App">
+      < header className="App-header">
+        < img src={logo} className="App-logo" alt="logo" />
+        < p onClick={onClick}>hello react!< /p>
+        <b>< Suspense fallback={< div>loading...</ div>}></b>
+          {visible && < SplitMe/>}
+        <b>< /Suspense></b>
+      < /header>
+    < /div>
+  );
+};
+</pre>
+
+- 공식 문서 참고 : https://reactjs.org/docs/code-splitting.html#reactlazy
+
+## 3. Loadable Components를 통한 코드 스플리팅
+- Loadable Components는 코드 스플리팅을 편하게 하도록 도와주는 서드파티 라이브러리.
+- 이 라이브러리의 이점은 <b>서버 사이드 렌더링</b>을 지원한다는 점 (React.lazy와 Suspense는 아직 서버 사이드 렌더링을 지원하지 않는다.) 
+또한, 렌더링하기 전에 필요할 때 스플리팅된 파일을 미리 불러올 수 있는 기능도 있다.
+> 서버 사이드 렌더링이란❓ <br>
+웹 서비스의 초기 로딩 속도 개선, 캐싱 및 검색 엔진 최적화를 가능하게 해 주는 기술이다.<br>
+서버 사이드 렌더링을 사용하면 웹 서비스의 초기 렌더링을 사용자의 브라우저가 아닌 서버 쪽에서 처리해준다.
+
+- <code>Loadable Components</code> 라이브러리 설치
+<pre>
+$ yarn add @loadable/component
+</pre>
+- <code>React.lazy</code>와 비슷하고, <code>Suspense</code>를 사용하지 않는다.
+<pre>
+// 두 번째 인자에 fallback 함수를 넣어 로딩 중에 다른 UI를 보여줄 수 있다.
+const SplitMe = loadable(() => import('./SplitMe'),{
+  fallback : < div>loading...< /div>
+});
+</pre>
+- <code>Loadable Components</code>의 컴포넌트를 미리 불러오는(preload) 방법
+- 마우스 커서를 올리기만 해도 로딩이 시작된고 클릭시 랜더링된다. => 개발자 도구 network 페이지에서 확인 가능
+<pre>
+const App = () => {
+  // 생략..
+  // loadable component에서 컴포넌트를 미리 불러오는 방법
+  const onMouseOver = () => {
+    SplitMe.preload();
+  }
+  return (
+      //생략..
+      < p onClick={onClick} onMouseOver={onMouseOver}>hello react!< /p>
+      {visible && < SplitMe/>}
+  );
+};
+</pre>
+
+- 이런 기능들 외에도 타임아웃, 로딩 UI 딜레이, 서버 사이드 렌더링 호환 등 다양한 기능을 제공한다.
+- 공식 문서 참고 : https://loadable-components.com/docs/getting-started/
