@@ -54,3 +54,6 @@
 - 코드 스플리팅
 - React.lazy 와 Suspense
 - Loadable Components
+
+## 14. [ssr-recipe](https://github.com/saseungmin/react-tutorial/tree/master/ssr-recipe)
+- 서버 사이드 렌더링 구현하기
