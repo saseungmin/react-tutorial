@@ -15,6 +15,7 @@ const UsersContainer = ({users,getUsers}) => {
     return (
         <>
             <Users users={users}/>
+            {/*resolve 함수를 props로 받아 오며, 컴포넌트가 렌더링될 떄 서버 환경에서만 resolve 함수를 호출해 준다. */}
             <Preloader resolve={getUsers}/>
         </>
     );

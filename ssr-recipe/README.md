@@ -176,3 +176,109 @@ function createPage(root){
 
 - 개발자 도구 Network 탭에서 확인해서 링크를 눌렀을때 클라이언트 렌더링이 되야한다. 즉, 다른 링크를 클릭하여 다른 페이지로 이동할 때 네트워크 요청이 추가로 발생하면 안된다.
 - 첫 번째 렌더링은 서버에서 하지만, 그 이후는 브라우저에서 처리한다.
+
+## 2. redux-thunk 미들웨어를 사용한 데이터 로딩
+- redux-thunk를 사용하여 API 호출
+<pre>
+$ yarn add redux react-redux redux-thunk axios
+</pre>
+
+> - 액션 타입, 액션 생성 함수, 리듀서 코드를 한 파일에 넣어서 관리하는 Ducks 패턴 사용
+>   - modules/users.js에 작성
+> - 루트 리듀서 생성 후, <code>Provider</code> 컴포넌트를 사용하여 프로젝트에 리덕스 적용
+>   - modules/index.js 와 src/index.js
+> - Users, UsersContainer 생성 (사용자에 대한 정보를 보여줄 컴포넌트)
+>   - components/Users.js 와 src/containers/UsersContainer.js
+
+📌 서버 사이드 렌더링을 할 떄는 <b>이미 있는 정보를 재요청하지 않게</b> 처리하는 작업이 중요하다. 이 작업을 하지 않으면 브라우저에서 페이지를 확인할 때 데이터가 있음에도 불구하고 불필요한 API를 호출하게 된다.
+> - 페이지 컴포넌트 생성 후, 라우트 설정
+>   - pages/UsersPage.js 와 App.js 라우트 추가
+> - 경로 설정
+>   - components/Menu.js 수정
+
+### 2.1 PreloadContext 만들기
+- 서버 사이드 렌더링을 할 때는 <code>useEffect</code>나 <code>componentDidMount</code>에서 설정한 작업이 호출되지 않는다.
+- 때문에 렌더링 하기전에 API를 요청한 뒤 스토어에 데이터를 담아야한다.
+
+✒ <b>lib/PreloadContext.js 생성 (주석 확인)</b>
+>  - PreloadContext는 서버 사이드 렌더링을 하는 과정에서 처리해야할 작업들을 실행하고, 만약 기다려야 하는 <code>promise</code>가 있다면 프로미스를 수집한다.
+>  - 모든 <code>promise</code>를 수집하고, <code>promise</code>들이 끝날 때까지 기다렸다가 그 다음에 렌더링하면 <b>데이터가 채워진 상태</b>로 컴포넌트들이 나타나게 된다.
+>  - container/UserContainer.js 수정 <code>< Preloader resolve={getUsers}/></code>
+
+### 2.2 서버에서 리덕스 설정 및 PreloadContext 사용하기
+- 브라우저에서 할 떄와 동일하게 리덕스 생성 (index.server.js)
+- <b>주의❗</b> 서버가 실행될 때 스토어를 한 번만 만드는 것이 아니라, <b>요청이 들어올 떄마다 새로운 스토어를 생성한다.</b>
+- <code>PreloadContext</code>를 사용하여 프로미스들을 수집하고 기달렸다가 다시 렌더링시키는 작업
+
+<pre>
+import PreloadContext from './lib/PreloadContext';
+// 생략
+const serverRender = async (req, res, next) => {
+// 생략
+    const preloadContext = {
+      done : false,
+      promises : []
+    }
+    const jsx = (
+        < PreloadContext.Provider value={preloadContext}>
+        // 생략..
+        < /PreloadContext.Provider>
+    );
+
+    ReactDOMServer.renderToStaticMarkup(jsx);
+    try {
+      await Promise.all(preloadContext.promises); // 모든 프로미스를 기달린다.
+    } catch (e) {
+      return res.status(500);
+    }
+    preloadContext.done = true;
+    // 서버에서 리액트 컴포넌트를 렌더링할 때 ReactDOMServer.renderToString 사용
+    const root = ReactDOMServer.renderToString(jsx); //렌더링
+}
+</pre>
+
+> - 첫 번째 렌더링 할 떄는 <code>renderToStaticMarkup</code> 함수를 사용했다.
+> - <code>renderToStaticMarkup</code>은 리액트를 사용하여 정적인 페이지를 만들 때 사용한다.
+> - 이 함수로 만든 리액트 렌더링 결과물은 클라이언트 쪽에서 HTML DOM 인터랙션을 지원하기 힘들다.
+> - <code>renderToString</code> 대신 <code>renderToStaticMarkup</code> 함수를 사용한 이유는 <code>Preloader</code>로 넣어 주었던 함수를 호출하기 위해서이다. 또 한, 이 함수의 처리 속도가 <code>renderToString</code> 보다 좀 더 빠르다. 
+
+### 2.3 스크립트로 스토어 초기 상태 주입하기.
+- 작성한 코드는 API를 통해 받아 온 테이터를 렌더링하지만, 렌더링하는 과정에서 만들어진 스토어의 상태를 브라우저에서 재사용하지 못한다.
+- 서버에서 만들어준 상태를 브라우저에서 재사용하려면 현재 스토어 상태를 <b>문자열로 반환한 뒤 스크립트로 주입</b>해 주어야 한다.
+- index.server.js 수정
+<pre>
+function createPage(root, stateScript){
+// 생략
+${stateScript}
+// 생략
+}
+const serverRender = async (req, res, next) => {
+// 생략
+const root = ReactDOMServer.renderToString(jsx); //렌더링
+const stateString = JSON.stringify(store.getState()).replace(/< /g, '\\u003c');
+const stateScript = `< script>__PRELOADED_STATE__ = ${stateString}< /script>`; //리덕스 초기 상태를 스크립트로 주입
+res.send(createPage(root,stateScript)); //클라이언트에게 결과물 응답.
+}
+</pre>
+> 🔶 위 과정에서 JSON을 문자로 변환하고 악성 스크립트가 실행되는 것을 방지하기 위해 <를 치환 처리 해준다.<br>
+> 📌 참고 문서 : https://redux.js.org/recipes/server-rendering#security-considerations
+
+- 브라우저에서 상태를 재사용할 때는 스토어 생성 과정에서 <code>window.__ PRELOADED_STATE__</code>를 초깃값으로 사용하면 된다.
+<pre>
+//index.js
+const store =createStore(
+  rootReducer,
+  window.__PRELOADED_STATE__, // 이름 그대로 이 값을 초기 상태로 사용함
+  applyMiddleware(thunk),
+  );
+</pre>
+
+- 빌드 후 서버를 실행 (http://localhost:5000/users)
+<pre>
+$ yarn build
+$ yarn build:server
+$ yarn start:server
+</pre>
+
+![API 연동 후 서버 사이드 렌더링](img/1.PNG)
+<hr>
