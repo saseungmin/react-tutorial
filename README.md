@@ -58,3 +58,5 @@
 ## 14. [ssr-recipe](https://github.com/saseungmin/react-tutorial/tree/master/ssr-recipe)
 - 서버 사이드 렌더링 구현하기
 - redux-thunk를 사용한 데이터 로딩
+- redux-saga를 사용한 데이터 로딩
+- Loadable Components를 사용한 서버 사이드 렌더링과 코드 스플리팅

@@ -282,3 +282,198 @@ $ yarn start:server
 
 ![API 연동 후 서버 사이드 렌더링](img/1.PNG)
 <hr>
+
+
+## 3. redux-saga를 사용한 서버 사이드 렌더링
+- redux-saga 라이브러리 설치
+<pre>$ yarn add redux-saga</pre>
+- redux-saga를 이용한 modules/users.js 에 특정 사용자 정보를 가져오는 소스 추가
+- modules/index.js에 redux-saga의 루트 사가를 적용한다.
+<pre>
+export function* rootSaga(){
+    yield all([usersSaga()]);
+}
+</pre>
+- 스토어 생성할 때 미들웨어를 적용
+<pre>
+const store =createStore(
+  rootReducer,
+  window.__PRELOADED_STATE__, // 이름 그대로 이 값을 초기 상태로 사용함
+  applyMiddleware(thunk, sagaMiddleware),
+);
+
+sagaMiddleware.run(rootSaga);
+</pre>
+
+<hr>
+
+#### ✒ User, UserContainer 컴포넌트 생성
+- components/User.js 생성
+- 컨테이너 컨포넌트를 <code>connect</code>함수 대신, <code>useSelector</code>와 <code>useDispatch</code> Hooks를 사용해 만든다.
+- 서버 사이드 렌더링을 해야 하기 때문에 <code>null</code> 이 아닌 <code>Preloader</code> 컴포넌트를 렌더링하여 반환한다.
+<pre>
+if(!user){
+    return < Preloader resolve={() => dispatch(getUser(id))}/>
+}
+</pre>
+- 이렇게 해주면 서버 사이드 렌더링을 하는 과정에서 데이터가 없을 경우 <code>GET_USER</code> 액션을 발생시킨다.
+<hr>
+
+- pages/UserPage.js에 Route 설정하기
+
+### 3.1 redux-saga를 위한 서버 사이드 렌더링 작업
+- redux-thunk를 사용하면 <code>Preloader</code>를 통해 호출한 함수들이 <code>Promise</code>를 반환하지만, redux-saga는 <code>Promise</code>를 반환하지 않기 때문에 추가 작업이 필요하다.
+- index.server.js 엔트리 파일에도 redux-saga 미들웨어 적용한다.
+- <code>toPromise</code>를 통해 <code>sagaMiddleware.run</code>을 통해 만든 Task를 <code>Promise</code>로 변환한다.
+- 별도의 작업을 하지 않으면 <code>Promise</code>는 끝나지 않는다. 이유는 <b>루트 사가에서 액션을 끝없이 모니터링 하기 때문이다.</b>
+<pre>
+const sagaPromise = sagaMiddleware.run(rootSaga).toPromise();
+</pre>
+- 그래서 <code>END</code> 액션을 발생시키면 액션 모니터링 작업이 종료되고, 모니터링되기 전에 시작된 <code>getUserSaga</code>와 같은 사가 함수들이 있다면 해당 함수들이 완료되고 나서 <code>Promise</code>가 종료되게 된다.
+- 이 <code>Promise</code>가 끝나는 시점에 리덕스 스토어는 데이터가 채워진다.
+<pre>
+store.dispatch(END);
+try {
+      await sagaPromise; // 기존에 진행 중이던 사가들이 모드 끝날 때까지 기달린다.
+      await Promise.all(preloadContext.promises); // 모든 프로미스를 기달린다.
+    } catch (e) {
+      return res.status(500);
+}
+</pre>
+- 빌드 후 서버를 실행 (http://localhost:5000/users/1)
+<pre>
+$ yarn build
+$ yarn build:server
+$ yarn start:server
+</pre>
+- 렌더링 결과
+
+![서버 사이드 렌더링](img/2.PNG)
+
+<hr>
+
+## 4. 서버 사이드 렌더링과 코드 스플리팅
+- <code>Loadable components</code>에서는 서버 사이드 렌더링을 할 떄 필요한 서버 유틸 함수와 웹팩 플러그인, babel 플러그인을 제공 해준다.
+- <code>Loadable components</code> 설치
+<pre>
+$ yarn add @loadable/component @loadable/server @loadable/webpack-plugin @loadable/babel-plugin
+</pre>
+
+### 4.1 라우팅 컴포넌트 스플리팅
+<pre>
+// App.js
+// 라우트 컴포넌트 스플리팅하기
+import loadable from '@loadable/component';
+const RedPage = loadable(() => import('./pages/RedPage'));
+const BluePage = loadable(() => import('./pages/BluePage'));
+const UsersPage = loadable(() => import('./pages/UsersPage'));
+</pre>
+
+### 4.2 웹팩과 babel 플러그인 적용
+- 웹팩과 babel 플러그인을 적용하면 깜박임 현상을 해결할 수 있다.
+- package.json - babel에 plugins 설정
+<pre>
+  "babel": {
+    "presets": [
+      "react-app"
+    ],
+    "plugins" : [
+      "@loadable/babel-plugin"
+    ]
+  }
+</pre>
+- webpack.config.js에서 <code>LoadablePlugin</code>을 불러오고 적용시킨다.
+<pre>
+// LoadablePlugin 불러오기
+const LoadablePlugin = require('@loadable/webpack-plugin');
+plugins: [
+      // LoadablePlugin 플러그인 적용
+      new LoadablePlugin(),
+      // Generates an `index.html` file with the < script> injected.
+      new HtmlWebpackPlugin(
+        // 생략..
+      )
+]
+</pre>
+- <code>$ yarn build</code> 실행 후 <code>build</code> 디렉터리에 <code>loadable-stats.json</code> 생성 확인
+- <code>loadable-stats.json</code> 파일을 참고하여 서버 사이드 렌더링을 할 때 어떤 컴포넌트가 렌더링되었는지에 따라 사전에 불러올지를 설정할 수 있다.
+
+### 4.3 필요한 청크 파일 경로 추출하기
+- 서버 사이드 렌더링 후 브라우저에서 어떤 파일을 사전에 불러와야 할지 알아내고 해당 파일들의 경로를 추출하기 위해 <code>Loadable components</code>에서 제공하는 <code>ChunkExtractor</code>와 <code>ChunkExtractorManger</code>를 사용한다.
+- 서버 엔트리 코드를 수정한다.
+- <code>loadable-stats.json</code>에서 경로를 조회한다.
+<pre>
+// 필요한 청크 파일 경로 추출하기
+import {ChunkExtractor, ChunkExtractorManager} from '@loadable/server';
+// Loadable Components를 통해 파일 경로를 조회한다.
+const statsFile = path.resolve('./build/loadable-stats.json');
+function createPage(root, tags){
+// index.server.js 참고
+}
+const serverRender = async (req, res, next) => {
+  // 생략..
+  // 필요한 파일을 추출하기 위한 ChunkExtractor
+  const extractor = new ChunkExtractor({ statsFile });
+  const jsx = (
+        < ChunkExtractorManager extractor={extractor}>
+        // 생략
+        < ChunkExtractorManager/>
+  )
+  // 생략...
+  const tags ={ 
+      scripts : stateScript + extractor.getScriptTags(), // 스크립트 앞부분에 리덕스 상태 넣기
+      links : extractor.getLinkTags(),
+      styles : extractor.getStyleTags()
+    }
+
+    res.send(createPage(root,tags)); //클라이언트에게 결과물 응답.
+}
+</pre>
+
+### 4.4 loadableReady와 hydrate
+- <code>Loadable components</code>를 사용하면 성능을 최적화하기 위해 모든 자바스크립트 파일을 동시에 받아온다.
+- 모든 스크립트가 로딩되고 나서 렌더링하도록 처리하기 위해서는 <code>loadableReady</code> 함수를 사용해 주어야 한다.
+- <code>hydrate</code>는 <code>render</code> 대신 사용할 수 있고 이 함수는 기존에 서버 사이드 렌더링된 <b>결과물이 이미 있을 경우 새로 렌더링을 하지 않고</b> 기존에 존재하는 UI에 이벤트만 연동하여 애플리케이션을 <b>초기 구동할 때 필요한 리소스를 최소화함으로써 성능을 최적화해 준다.</b>
+<pre>
+//index.js
+import {loadableReady} from '@loadable/component';
+// 생략..
+// 같은 내용을 쉽게 재사용할 수 있도록 렌더링할 내용을 하나의 컴포넌트로 묶음
+const Root = () => {
+  return (
+    < Provider store={store}>
+      < BrowserRouter>
+        < App />
+      < /BrowserRouter>
+    < /Provider>
+  );
+};
+const root = document.getElementById('root');
+
+// 프로덕션 환경에서는 loadableReady와 hydrate를 사용하고
+// 개발 환경에서는 기존 방식으로 처리
+if(process.env.NODE_ENV === 'production'){
+  loadableReady(() => {
+    ReactDOM.hydrate(< Root/>, root);
+  });
+}else{
+  ReactDOM.render(< Root/>, root);
+}
+</pre>
+- 코드 스플리팅 + 서버 사이드 렌더링
+
+![서버 사이드 렌더링](img/3.PNG)
+
+<hr>
+
+## 5. 서버 사이드 렌더링의 환경 구축을 위한 대안
+### 5.1 Next.js
+- <code>Next.js(https://nextjs.org/)</code>라는 리액트 프레임워크를 사용하면 작업을 최소한의 설정으로 간단하게 설정할 수 있다.
+- 하지만 <b>리액트 라우터와 호환되지 않는다.</b> 따라서 이미 작성된 프로젝트에 적용하는 것은 매우 까다로운 작업이다.
+- Next.js는 파일 시스템에 기반하여 라우트를 설정한다.
+- 위와 같은 작업들을 모두 Next.js가 대신 해주기 때문에 실제 작동 원리를 파악하기 힘들어진다.
+
+### 5.2 Razzle
+- <code>Razzle(https://github.com/jaredpalmer/razzle)</code> 또한 Next.js 처럼 서버 사이드 렌더링 작업을 쉽게 도와주는 도구이며, 프로젝트 구성이 CRA와 매우 유사하다. 그렇기 때문에 리액트 라우터와 호환이 잘된다.
+- 하지만 코드 스플리팅 시 발생하는 깜박임 현상을 해결하기 어렵다는 단점이 있다.
+- <code>Loadable components</code>를 적용하는 것은 불가능하지 않지만, 최신 버전의 <code>Loadable components</code>가 기본 설정으로는 작동하지 않아서 까다롭다.
