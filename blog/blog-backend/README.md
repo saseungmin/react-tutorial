@@ -141,3 +141,36 @@ router.get('/posts', (ctx) => {
 // app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());
 </pre>
+
+### 4.2 posts 라우트 생성
+- <code>GET</code> 메소드는 웹 브라우저에서 주소를 입력하여 테스팅을 할 수 있지만, <code>POST,DELETE,PUT,PATCH</code> 메서드를 사용하는 API는 자바스크립트를 호출해야 한다.
+- REST API 요청 테스팅을 쉽게 할 수 있는 Postman 설치 (https://www.postman.com/)
+- <code>POST/PUT/PATCH</code>같은 메서드의 Request Body에 JSON 형식으로 데이터를 넣어주면, 이를 파싱하여 서버에서 사용할 수 있게 해주는 <code>Koa-bodyparser</code> 미들웨어 설치
+<pre>$ yarn add koa-bodyparser</pre>
+- <b>❗ 주의할 점: </b> <code>router</code>를 적용하는 코드의 윗부분에서 해야한다.
+<pre>
+const bodyParser = require('koa-bodyparser');
+
+router.use('/api', api.routes()); //api 라우트 적용
+// 라우터 적용전에 bodyParser 적용
+<b>app.use(bodyParser());</b>
+// app 인스턴스에 라우터 적용
+app.use(router.routes()).use(router.allowedMethods());
+</pre> 
+- posts/posts.ctrl.js 작성 후 라우트에 연결
+<pre>
+// src/api/posts/index.js
+const Router = require('koa-router');
+const postsCtrl = require('./posts.ctrl');
+const post = new Router();
+
+post.get('/', postsCtrl.list);
+post.post('/', postsCtrl.write);
+post.get('/:id', postsCtrl.read);
+post.delete('/:id', postsCtrl.remove);
+// 데이터를 새 정보로 통째로 교체할 때 사용
+post.put('/:id', postsCtrl.replace);
+// 데이터의 특정 필드를 수정할 때 사용
+post.patch('/:id', postsCtrl.update);
+module.exports = post;
+</pre>
