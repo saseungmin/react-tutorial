@@ -63,3 +63,4 @@
 
 ## 15. [blog](https://github.com/saseungmin/react-tutorial/tree/master/blog)
 - Node.js의 Koa 프레임워크
+- mongoose를 이용한 MongoDB 연동
