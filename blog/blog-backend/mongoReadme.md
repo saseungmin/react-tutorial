@@ -123,3 +123,215 @@ export default Post;
 - 첫 번째 파라미터는 스키마 이름이고, 두 번째 파라미터는 스키마 객체이다.
 - 스키마 이름을 정해 주면 그이름의 복수 형태로 데이터베이스에 컬렉션 이름을 만든다. (Post => posts)
 - 위와 같은 권장되는 규칙을 따르고 싶지 않다면, 세 번째 파라미터에 원하는 이름을 넣어주면 된다.
+
+## ✒ 데이터 생성, 조회, 삭제와 수정
+
+### 🔸 데이터 생성
+- src/api/posts/posts.ctrl.js - write
+<pre>
+import Post from '../../models/post';
+
+export const write = async (ctx) => {
+  const { title, body, tags } = ctx.request.body;
+  const post = new Post({
+    title,
+    body,
+    tags,
+  });
+  try {
+    <b>await post.save();</b>
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+</pre>
+- 인스턴스를 만들 때 <code>new</code> 키워드 사용해서 생성자 함수의 파라미터에 정보를 지닌 객체를 넣는다.
+- 인스턴스를 만들고 <code>save()</code> 함수를 실행시켜야 데이터베이스에 저장된다.
+- <code>save()</code> 함수의 반환 값은 <code>Promise</code>이므로 <code>async/await</code> 문법으로 데이터베이스 저장 요청을 완료할 때까지 <code>await</code>를 사용하여 대기할 수 있다.
+
+### 🔸 데이터 조회
+- src/api/posts/posts.ctrl.js - list
+<pre>
+export const list = async (ctx) => {
+  try {
+    const posts = await Post.find().exec();
+    ctx.body = posts;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+</pre>
+- <code>find()</code> 함수를 호출한 후 <code>exec()</code>를 붙여 주어야 서버에 쿼리를 요청한다.
+
+### 🔸 특정 데이터 조회
+- src/api/posts/posts.ctrl.js - read
+<pre>
+export const read = async (ctx) => {
+  const { id } = ctx.params;
+  try {
+    const post = await Post.findById(id).exec();
+    if (!post) {
+      ctx.status = 404; // not found
+      return;
+    }
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+</pre>
+- <code>findById()</code> 함수를 사용해서 id에 해당하는 값을 조회한다.
+
+### 🔸 데이터 삭제
+- <code>remove()</code> : 특정 조건을 만족하는 데이터를 모두 지운다.
+- <code>findByIdAndRemove()</code> : id를 찾아서 지운다.
+- <code>findOneAndRemove()</code> : 특정 조건을 만족하는 데이터 하나를 찾아서 제거한다.
+<pre>
+export const read = async (ctx) => {
+  const { id } = ctx.params;
+  try {
+    await Post.findByIdAndRemove(id).exec();
+    ctx.status = 204; // No Content
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+</pre>
+
+### 🔸 데이터 수정
+- <code>findByIdAndUpdate()</code> 함수를 사용할 때 첫 번째 파라미터는 id, 두 번째 파라미터는 업데이트 내용, 세 번째 파라미터는 업데이트 옵션이다.
+<pre>
+export const update = async (ctx) => {
+  const { id } = ctx.params;
+  try {
+    const post = await Post.findByIdAndUpdate(id, ctx.request.body, {
+      new: true, // true 면 업데이트된 데이터를 반환한다.
+      // false면 업데이트되기 전의 데이터를 반환한다.
+    }).exec();
+    if (!post) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = post;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+</pre>
+
+## ✒ 요청 검증
+### 🔸 ObjectId 검증
+- 잘못된 id를 전달했을 시 id 값이 올바른 ObjectId 인지 확인이 필요하다.
+<pre>
+import mongoose from 'mongoose';
+
+// ObjectId 검증
+const { ObjectId } = mongoose.Types;
+export const checkObjectId = (ctx, next) => {
+  const { id } = ctx.params;
+  // 올바른 id 값인지 검증한다.
+  if (!ObjectId.isValid(id)) {
+    ctx.status = 400;
+    return;
+  }
+  return next();
+};
+</pre>
+
+- /api/posts/:id 경로를 위한 라우터를 새로 만들고 posts에 해당 라우터 등록해 준다.
+<pre>
+const post = new Router(); // /api/posts/:id
+post.get('/', postsCtrl.read);
+post.delete('/', postsCtrl.remove);
+post.patch('/', postsCtrl.update);
+posts.use('/:id', postsCtrl.checkObjectId, post.routes());
+//module.exports = post;
+export default posts
+</pre>
+
+### 🔸 Request Body 검증
+- write, update API에서 전달받은 요청 내용을 검증한다.
+- Joi(https://github.com/hapijs/joi) 라이브러리 설치
+<pre>
+$ yarn add @hapi/joi
+</pre>
+<pre>
+import Joi from '@hapi/joi';
+
+export const write = async (ctx) => {
+  const schema = Joi.object().keys({
+    // 객체가 다음 필드를 가지고 있음을 검증
+    title: Joi.string().required(), // required() 가 있으면 필수 항목
+    body: Joi.string().required(),
+    tags: Joi.array().items(Joi.string()).required(), // 문자열로 이루어진 배열
+  });
+
+  //검증 후 에러 처리
+  const result = schema.validate(ctx.request.body);
+  if (result.error) {
+    ctx.status = 400; // Bad Request
+    ctx.body = result.error;
+    return;
+  }
+  // 생략..
+};
+</pre>
+
+## ✒ 페이지네이션 구현
+### 🔸 포스트를 역순으로 불러오기
+- 최근 작성된 포스트를 먼저 불러오기
+- <code>sort()</code> _id 를 -1 하면 내림차순으로 정렬하고 1로 설정해주면 오름차순으로 정렬한다.
+<pre>
+const posts = await Post.find()
+      .sort({ _id: -1 }).exec();
+</pre>
+### 🔸 보이는 개수를 제한
+- 개수를 제한할 때는 <code>limit()</code>함수를 사용하고 <code>limit(10)</code>라고하면 10개로 제한한다.
+<pre>
+const posts = await Post.find()
+      .sort({ _id: -1 }).limit(10).exec();
+</pre>
+### 🔸 페이지 기능 구현
+- <code>skip</code>함수를 사용해서 파라미터로 10을 넣어 주면, 처음 10개를 제외하고 그 다음 데이터를 불러온다.
+- <code>skip</code>함수의 파라미터에 <code>(page - 1) * 10</code>을 넣어주어 1페이지에는 10개를 불러오고 2페이지에는 그 다음 10개를 불러온다.
+<pre>
+  // query는 문자열이기 때문에 숫자로 변환
+  // 값이 주어지지 않았다면 1을 기본으로 사용.
+  const page = parseInt(ctx.query.page || '1', 10);
+  if (page < 1) {
+    ctx.status = 400;
+    return;
+  }
+  // 생략
+  const posts = await Post.find()
+      .sort({ _id: -1 })
+      .limit(10)
+      .skip((page - 1) * 10).exec();
+</pre>
+
+### 🔸 마지막 페이지 번호 알려 주기
+- 커스텀 헤더를 설정해서 마지막 페이지 번호를 알려준다.
+<pre>
+// 마지막 페이지 번호 알려주기
+const postCount = await Post.countDocuments().exec();
+ctx.set('Last-Page', Math.ceil(postCount / 10));
+</pre>
+![Last-Page](img/2.PNG)
+
+### 🔸 내용 길이 제한
+- body의 길이가 200자 이상이면 뒤에 '...'을 붙이고 문자열을 자른다.
+- <code>find()</code>를 통해 조회한 mongoose 문서 인스턴스의 형태이므로 데이터를 <code>toJSON()</code> 함수를 실행하거나 <code>lean()</code>을 사용해서 JSON 형태로 조회한다.
+<pre>
+  const posts = await Post.find()
+      .sort({ _id: -1 })
+      .limit(10)
+      .skip((page - 1) * 10)
+      .lean().exec();
+  // 생략..
+  ctx.body = posts.map(post => ({
+    ...post,
+    body:
+      post.body.length < 200 ? post.body : `${post.body.slice(0, 200)}...`,
+  }));
+</pre>
