@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 
 //const api = require('./api');
 import api from './api';
+import jwtMiddleware from './lib/jwtMiddleware';
 //import createFakeData from './createFakeData';
 
 // 비구조화 할당을 통해 process.env 내부 값에 대한 레퍼런스 만들기
@@ -83,6 +84,8 @@ router.get('/posts', (ctx) => {
 router.use('/api', api.routes()); //api 라우트 적용
 // 라우터 적용전에 bodyParser 적용
 app.use(bodyParser());
+// 토큰 검증 미들웨어 적용 app에 router 미들웨어를 적용하기 전에 이루어져야 한다.
+app.use(jwtMiddleware);
 // app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());
 
