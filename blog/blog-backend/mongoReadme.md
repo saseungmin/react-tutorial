@@ -1,6 +1,7 @@
 # ✔ mongoose를 이용한 MongoDB 연동
 ### 📌 [JWT를 통한 회원 인증 ReadMe.md로 가기](https://github.com/saseungmin/react-tutorial/blob/master/blog/blog-backend/JWTReadme.md)
 <hr>
+
 - MongoDB는 문서 지향적 NoSQL 데이터베이스.
 - 새로운 무서를 만들면 <code>_id</code>라는 고윳값을 자동으로 생성한다.
 - <code>_id</code> 값은 시간, 머신 아이디, 프로세스 아이디, 순차 번호로 되어 있어 값의 고유함을 보장한다.
