@@ -8,3 +8,6 @@ export const register = ({username, password}) => client.post('/api/auth/registe
 
 //로그인상태 확인
 export const check = () => client.get('/api/auth/check');
+
+// 로그아웃
+export const logout = () => client.post('/api/auth/logout');
