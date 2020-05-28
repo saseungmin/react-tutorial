@@ -15,6 +15,7 @@ const ResponsiveBlock = styled.div`
   }
 `;
 
+// children => logo, right element
 const Responsive = ({ children, ...rest }) => {
   // style, className, onClick, onMouseMove 등의 props를 사용할 수 있도록 ...rest를 사용하여 ResponsivBlock에게 전달
   return <ResponsiveBlock {...rest}>{children}</ResponsiveBlock>;
