@@ -15,23 +15,21 @@
 
 ## 2. 기본적인 사용법
 - 리액트 라우터 라이브러리 설치
-<pre><code>
+<pre>
 $ yarn add react-router-dom
-</code></pre>
+</pre>
 - 리액트 라우터 적용 (src/index.js)
-<pre><code>
+<pre>
   // 웹 애플리케이션에 있는 HTML5의 history API를 사용하여 페이지를 새로고침하지 않고도 주소를 변경하고
   // 현재 주소에 관련된 정보를 props로 쉽게 조회하거나 사용할 수 있도록 해준다.
     < BrowserRouter>
         < App/>
     < /BrowserRouter>
-
-</code></pre>
+</pre>
 
 ### 2.1 Route 컴포넌트로 특정 주소에 컴포넌트 연결
 - exact는 <code>/about</code> , <code>/</code> 경로가 겹치는 상황에서 <code>exact={true}</code> 를 하면 같이 안보이게 된다.
-<pre><code> 
-
+<pre> 
 < Route path="주소규칙" component={보여 줄 컴포넌트} exact={true}/> 
 
 // 여려개의 path 지정할 때
@@ -39,16 +37,15 @@ $ yarn add react-router-dom
 
 // component 대신 render를 사용해 보여주고 싶은 JSX를 넣어 줄 수 있다.
 < Route path="/profiles" exact render={() => < div>사용자를 선택해 주세요.< /div>}/>
-
-</code></pre>
+</pre>
 
 ### 2.2 Link 컴포넌트로 다른 주소에 이동
 - a 태그 같은 개념 but, a태그 사용시 페이지를 새로 불러오기 때문에 애플리케이션이 들고 있던 상태를 모두 날려 버리게 된다.
-<pre><code> < Link to="주소">내용< /Link> </code></pre>
+<pre> < Link to="주소">내용< /Link> </pre>
 
 ## 3. URL 파라미터와 쿼리
 ### 3.1 URL 파라미터
-<pre><code> 
+<pre>
 // App.js
 < Link to="/profiles/seungmin">seungmin< /Link>
 < Route path="/profiles/:username" component={Profile} />
@@ -57,17 +54,18 @@ const Profile = ({match}) => {
     const {username} = match.params; //params로 값을 받을 수 있다.
     const profile = data[username];
 }
-</code></pre>
+</pre>
 
 ### 3.2 URL 쿼리
 - URL 쿼리는 넘어올 때 문자열도 되어있다.
 - 그래서 안의 값을 읽어올려면 객체 형태로 변환해 주어야 한다.
 - qs 쿼리 문자열을 객체로 변환
-<pre><code> 
+- 📌참고 문서(qs) : https://www.npmjs.com/package/qs
+<pre>
 $ yarn add ps
 // About.js 확인
 생략
-</code></pre>
+</pre>
 - 넘어 올때 문자열이기 때문에 숫자는 <code> parseInt</code> 를 사용해야하고 <code>boolean</code>  타입은 <code>"true" === "true"</code>  처럼 확인한다.
 
 ## 4. 서브 라우트
@@ -85,28 +83,26 @@ $ yarn add ps
 - <code>withRouterSample.js</code> 참고
 ### 5.3 Switch
 - <code>Switch</code> 컴포넌트는 여러 <code>Router</code>를 감싸사 그 중 일치하는 단 하나의 라우트만을 렌더링시켜 준다.
-<pre><code>
-
-      < Switch>
-          < Route path="/" component={Home} exact={true}/>
-          < Route path={["/about",'/info']} component={About}/>      
-          < Route path="/profiles" component={Profiles}/>
-          < Route path="/history" component={HistorySample} />
-          < Route //path를 따로 정의하지 않으면 모든 상황에서 렌더링됨
-            render = {({location}) => (
-              < div>
-                < h2>이 페이지는 존재하지 않습니다:< /h2>
-                < p>{location.pathname}< /p>
-              < /div>
-            )} />
-      < /Switch>
-
-</code></pre>
+<pre>
+< Switch>
+    < Route path="/" component={Home} exact={true}/>
+    < Route path={["/about",'/info']} component={About}/>      
+    < Route path="/profiles" component={Profiles}/>
+    < Route path="/history" component={HistorySample} />
+    < Route //path를 따로 정의하지 않으면 모든 상황에서 렌더링됨
+      render = {({location}) => (
+        < div>
+          < h2>이 페이지는 존재하지 않습니다:< /h2>
+          < p>{location.pathname}< /p>
+        < /div>
+      )} />
+< /Switch>
+</pre>
 
 ### 5.4 NavLink
 - <code>Link</code> 와 비슷.
 - 현재 경로와 <code>Link</code>에서 사용하는 경로가 일치하는 경우 특정 스타일 혹은 CSS클래스를 적용할 수 있다.
 - <code>NavLink</code>에서 링크가 활성화 되었을 때 스타일 적용할 때는 <code>activeStyle</code>값을, CSS클래스를 적용할 때는 <code>activeClassName</code> 값을 <code>props</code>로 넣어 준다.
-<pre><code>
+<pre>
 < NavLink activeStyle={activeStyle} to="/profiles/seungmin">seungmin< /NavLink>
-</code></pre>
+</pre>
