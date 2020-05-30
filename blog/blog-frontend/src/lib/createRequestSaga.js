@@ -18,6 +18,8 @@ export default function createRequestSaga(type, request) {
       yield put({
         type: SUCCESS,
         payload: response.data,
+        // HTTP 헤더 및 상태 코드 값 조회
+        meta: response,
       });
     } catch (e) {
       yield put({
