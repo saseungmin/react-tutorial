@@ -64,6 +64,17 @@ const Editor = ({ title, body, onChangeField }) => {
     });
   }, [onChangeField]);
 
+  // 수정
+  // Editor 컴포넌트에서 받아오는 body 값은 Quill 에디터에서 내용을 입력할 때마다 변경된다.
+  // body가 변경될 때 마다 useEffect 등록한 함수 호출
+  const mounted = useRef(false);
+  useEffect(() => {
+    // 처음 mounted는 false 고 mounted가 true로 변경되며 컴포넌트가 회면에 마운트되고 나서 단 한번만 실행된다.
+    if (mounted.current) return;
+    mounted.current = true;
+    quillInstance.current.root.innerHTML = body;
+  }, [body]);
+
   const onChangeTitle = (e) => {
     onChangeField({ key: 'title', value: e.target.value });
   };

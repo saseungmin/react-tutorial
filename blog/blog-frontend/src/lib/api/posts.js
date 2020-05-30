@@ -14,3 +14,11 @@ export const listPosts = ({ page, username, tag }) => {
   });
   return client.get(`/api/posts?${queryString}`);
 };
+
+// post 수정
+export const updatePost = ({ id, title, body, tags }) =>
+  client.patch(`/api/posts/${id}`, {
+    title,
+    body,
+    tags,
+  });
