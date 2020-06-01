@@ -4,6 +4,7 @@ import Responsive from '../common/Responsive';
 import palette from '../../lib/styles/palette';
 import SubInfo from '../../containers/common/SubInfo';
 import Tags from '../../containers/common/Tags';
+import { Helmet } from 'react-helmet-async';
 
 const PostViewerBlock = styled(Responsive)`
   margin-top: 4rem;
@@ -70,6 +71,9 @@ const PostViewer = ({ post, error, loading, actionButtons }) => {
   const { title, body, user, publishedDate, tags } = post;
   return (
     <PostViewerBlock>
+      <Helmet>
+        <title>{title} - REACTERS</title>
+      </Helmet>
       <PostHead>
         <h1>{title}</h1>
         <SubInfo

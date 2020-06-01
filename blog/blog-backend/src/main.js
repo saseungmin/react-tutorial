@@ -14,6 +14,11 @@ import api from './api';
 import jwtMiddleware from './lib/jwtMiddleware';
 //import createFakeData from './createFakeData';
 
+// koa-static으로 정적 파일 제공하기
+import serve from 'koa-static';
+import path from 'path';
+import send from 'koa-send';
+
 // 비구조화 할당을 통해 process.env 내부 값에 대한 레퍼런스 만들기
 const { PORT, MONGO_URI } = process.env;
 
@@ -63,16 +68,16 @@ const router = new Router();
 
 // 라우터 설정
 // 첫번째 파라미터에는 경로를 넣고 두번째 파라미터에는 해당 라우터에 적용할 미들웨어 함수를 넣는다.
-router.get('/', (ctx) => {
-  ctx.body = '홈';
-});
+// router.get('/', (ctx) => {
+//   ctx.body = '홈';
+// });
 
-// http://localhost:4000/about/react
-router.get('/about/:name', (ctx) => {
-  const { name } = ctx.params;
-  // name의 존재 유무에 따라 다른 결과 출력
-  ctx.body = name ? `${name}의 소개` : '소개';
-});
+// // http://localhost:4000/about/react
+// router.get('/about/:name', (ctx) => {
+//   const { name } = ctx.params;
+//   // name의 존재 유무에 따라 다른 결과 출력
+//   ctx.body = name ? `${name}의 소개` : '소개';
+// });
 
 // http://localhost:4000/posts?id=승민
 router.get('/posts', (ctx) => {
@@ -88,6 +93,18 @@ app.use(bodyParser());
 app.use(jwtMiddleware);
 // app 인스턴스에 라우터 적용
 app.use(router.routes()).use(router.allowedMethods());
+
+const buildDirectory = path.resolve(__dirname, '../../blog-frontend/build');
+// koa-static을 사용하여 blog-frontend/build 디렉터리에 있는 파일들을 서버를 통해 조회할 수 있게 해 주었다.
+app.use(serve(buildDirectory));
+app.use(async (ctx) => {
+  // not found 이고, 주소가 /api로 시작하지 않는 경우
+  if (ctx.status === 404 && ctx.path.indexOf('/api') !== 0) {
+    // 이 미들웨어는 클라리언트 기반 라우팅이 제대로 작동하게 해준다.
+    // index.html 내용을 반환
+    await send(ctx, 'index.html', { root: buildDirectory });
+  }
+});
 
 // 포드가 지정되어 있지 않으면 4000번 사용
 const port = PORT || 4000;

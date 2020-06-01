@@ -69,3 +69,5 @@
 - 회원 별 글쓰기 기능 구현 (Quill 에디터)
 - 포스트(글) 읽기, 목록 페이지 구현(HTMP필터링하기(sanitize-html),페이지네이션)
 - 포스트(글) 수정, 삭제하기(modal)
+- react-helmet-async로 meta 태그 설정하기
+- koa-static으로 정적 파일 제공하기
