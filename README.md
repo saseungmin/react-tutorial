@@ -71,3 +71,12 @@
 - 포스트(글) 수정, 삭제하기(modal)
 - react-helmet-async로 meta 태그 설정하기
 - koa-static으로 정적 파일 제공하기
+
+## 16. 리액트 관련 커뮤니티
+### 🔶 국내
+- React Korea(https://www.facebook.com/groups/react.ko)
+- 프런트엔드 개발 그룹(https://www.facebook.com/groups/webfrontend)
+
+### 🔶 국외
+- Reddit의 React 페이지 (https://www.reddit.com/r/reactjs/)
+- Reactiflux (https://www.reactiflux.com/)
